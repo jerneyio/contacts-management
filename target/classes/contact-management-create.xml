@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+	<sub-flow name="create-contact" doc:id="81e98df7-d4cd-46d5-a404-c39771c6a4a2" >
+		<logger level="INFO" doc:name="Start" doc:id="03e03928-dd45-4d00-905a-1a8f19c59c97" message="#[attributes] - Create contact request"/>
+		<ee:transform doc:name="Request Payload" doc:id="f136c845-f75c-4157-a8ae-0c73f930f0af" >
+			<ee:variables >
+				<ee:set-variable resource="mappings/update-create.dwl" variableName="contactReq" />
+			</ee:variables>
+		</ee:transform>
+		<db:insert doc:name="Insert" doc:id="279f0712-df3c-42e5-9f62-6391c4cb8adc" config-ref="Database_Config">
+			<db:sql >INSERT INTO contact.create_contact (firstName, lastName, DOB, gender, title, addressType, addressNumber, street, addressUnit, city, state, zipcode, commType1, commValue1, preferred1, commType2, commValue2, preferred2)
+VALUES
+(:firstName, :lastName, :DOB, :gender, :title, :addressType, :addressNumber, :street, :addressUnit, :city, :state, :zipcode, :commType1, :commValue1, :preferred1, :commType2, :commValue2, :preferred2)</db:sql>
+			<db:input-parameters ><![CDATA[#[
+	{
+		'firstName' : vars.contactReq.firstName, 
+		'lastName': vars.contactReq.lastName, 
+		'DOB': vars.contactReq.DOB,
+		'gender': vars.contactReq.gender,
+		'title': vars.contactReq.title,
+		'addressType': vars.contactReq.addressType,
+		'addressNumber': vars.contactReq.addressNumber,
+		'street': vars.contactReq.street,
+		'addressUnit': vars.contactReq.addressUnit,
+		'city': vars.contactReq.city,
+		'state': vars.contactReq.state,
+		'zipcode': vars.contactReq.zipcode,
+		'commType1': vars.contactReq.commType1,
+		'commValue1': vars.contactReq.commValue1,
+		'preferred1': vars.contactReq.preferred1,
+		'commType2': vars.contactReq.commType2,
+		'commValue2': vars.contactReq.commValue2,
+		'preferred2': vars.contactReq.preferred2,
+		'contactId': vars.contactId
+	}
+]]]></db:input-parameters>
+		</db:insert>
+		<ee:transform doc:name="Response" doc:id="73171c7b-7c3d-4f29-927f-2ad7d0a64985" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": "Contact created",
+	"affectedRows": 1
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="End" doc:id="3d42d60c-4a6d-499e-9976-d817659b2860" message="#[payload] - Create contact Successful"/>
+	</sub-flow>
+</mule>

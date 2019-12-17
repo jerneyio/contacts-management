@@ -1,0 +1,13 @@
+#%RAML 1.0 DataType
+displayName: Contact Details
+properties:
+  Identification:
+    type: !include identification.raml
+  Address: 
+    type: array
+    items: !include address.raml
+  Communication:
+    type: array
+    items: !include communication.raml
+  
+examples: !include ..//examples/responses/contact.raml

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	
+	
+	<sub-flow name="get-contact" doc:id="691ab110-2bb5-42d4-ad7f-0045b9a91cc2" >
+		<logger level="INFO" doc:name="Start" doc:id="50782a47-1514-4801-9478-0caeda2eb367" message="#[attributes] - Get contact details request"/>
+		<db:select doc:name="Select" doc:id="45599a9e-4243-4cbd-92bf-5ca551053600" config-ref="Database_Config">
+			<db:sql >SELECT * FROM contact.create_contact WHERE id = :contactId;</db:sql>
+			<db:input-parameters ><![CDATA[#[{'contactId' : attributes.uriParams.contactId}]]]></db:input-parameters>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="10dc7d5d-4972-46a2-959e-c171dc8fdd9a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json skipNullOn="everywhere"
+---
+contacts: payload map {
+    Identification: {
+        contactId: $.id,
+        firstName: $.firstname,
+        lastname: $.lastName,
+        DOB: $.DOB,
+        gender: $.gender,
+        title: $.titel
+    },
+    Address: [
+        {
+            'type': $.addressType,
+            number: $.addressNumber,
+            street: $.street,
+            unit: $.addressUnit,
+            city: $.city,
+            state: $.state,
+            zipcode: $.zipcode
+        }
+    ],
+    Communication: [
+        {
+            'type': $.commType1,
+            value: $.commValue1,
+            preferred: $.preferred1
+
+        },
+        {
+            'type': $.commType2,
+            value: $.commValue2,
+            preferred: $.preferred2
+
+        }
+    ]
+}
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="End" doc:id="02c0981e-0217-4ff4-883d-45c2c11734fd" message="#[payload] - Get Contact Details Successsul"/>
+	</sub-flow>
+</mule>

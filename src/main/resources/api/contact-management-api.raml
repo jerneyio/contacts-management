@@ -1,0 +1,78 @@
+#%RAML 1.0
+baseUri: https://anypoint.mulesoft.com/mocking/api/v1/links/a1f57438-f30f-4fd9-a993-1d330486100e/ # 
+title: contact-management-api
+description: This API is used to manage the contact information
+version: v1
+documentation:
+  - title: Asset Change History
+    content: !include documentation/asset-change-history.md
+
+mediaType: [application/json]
+
+uses: 
+  common-error-responses: commonError/common-error-response.raml
+
+types: 
+  contact-management: !include dataTypes/contact.raml
+
+/contacts:
+  type: common-error-responses.standard_endpoint
+  displayName: contact managemnet
+  post:
+    displayName: Create contact
+    body:
+      application/json:
+          type: contact-management
+    responses:
+      201:
+        body:
+          application/json:
+            example:
+                    {
+                      "message": "Contact created",
+                      "affectedRows": 1
+                    }
+  get:
+    displayName: Get all contacts
+    responses:
+      200:
+        body:
+          application/json:
+            type: contact-management                   
+              
+  /{contactId}:
+    type: common-error-responses.standard_endpoint
+    displayName: Get contact details
+    get:
+      displayName: Contact details
+      responses:
+        200:
+          body:
+            application/json:
+              type: contact-management
+
+    put:
+      displayName: Update contact details
+      body:
+        application/json:
+            type: contact-management
+      responses:
+        200:
+          body:
+            application/json:
+              example:
+                {
+                  "message": "Updated successfully"
+                }
+                
+    delete:
+      displayName: Delete contact
+      responses:
+        200:
+          body:
+            application/json:
+              example:
+                {
+                  "message": "Deleted successfully"
+                }
+

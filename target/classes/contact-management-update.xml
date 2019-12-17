@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+	<sub-flow name="update-contact" doc:id="8eaad41b-07ff-4eab-97dc-d382006136b6" >
+		<logger level="INFO" doc:name="Start" doc:id="1605e85b-6c36-4dbb-84ec-40fc4c926cec" message="#[attributes] - Update contact request"/>
+		<ee:transform doc:name="Update Request" doc:id="2192b5ca-f792-4386-ad89-53c1a371d7ba" >
+			<ee:variables >
+				<ee:set-variable resource="mappings/update-create.dwl" variableName="contactReq" />
+			</ee:variables>
+		</ee:transform>
+		<db:update doc:name="Update" doc:id="e5d7cc24-b0aa-40af-9a41-3415f8f66e1f" config-ref="Database_Config">
+			<db:sql >UPDATE  contact.create_contact SET
+firstName = :firstName, 
+lastName = :lastName, 
+DOB = :DOB, 
+gender = :gender, 
+title = :title, 
+addressType = :addressType, 
+addressNumber = :addressNumber, 
+street = :street, 
+addressUnit = :addressUnit, 
+city = :city, 
+state = :state, 
+zipcode = :zipcode, 
+commType1 = :commType1, 
+commValue1 = :commValue1, 
+preferred1 = :preferred1, 
+commType2 = :commType2, 
+commValue2 = :commValue2, 
+preferred2 = :preferred2
+WHERE id = :contactId;</db:sql>
+			<db:input-parameters ><![CDATA[#[
+	{
+		'firstName' : vars.contactReq.firstName, 
+		'lastName': vars.contactReq.lastName, 
+		'DOB': vars.contactReq.DOB,
+		'gender': vars.contactReq.gender,
+		'title': vars.contactReq.title,
+		'addressType': vars.contactReq.addressType,
+		'addressNumber': vars.contactReq.addressNumber,
+		'street': vars.contactReq.street,
+		'addressUnit': vars.contactReq.addressUnit,
+		'city': vars.contactReq.city,
+		'state': vars.contactReq.state,
+		'zipcode': vars.contactReq.zipcode,
+		'commType1': vars.contactReq.commType1,
+		'commValue1': vars.contactReq.commValue1,
+		'preferred1': vars.contactReq.preferred1,
+		'commType2': vars.contactReq.commType2,
+		'commValue2': vars.contactReq.commValue2,
+		'preferred2': vars.contactReq.preferred2,
+		'contactId': attributes.uriParams.contactId
+	}
+]]]></db:input-parameters>
+		</db:update>
+		<ee:transform doc:name="Transform Message" doc:id="ead54328-b07f-46ff-b67d-b7a396162359" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": "Updated successfully"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="End" doc:id="b9d9cfaa-17b5-4fdc-9655-5160b94f916d" message="#[payload] - Update Cotact Successful"/>
+	</sub-flow>
+</mule>

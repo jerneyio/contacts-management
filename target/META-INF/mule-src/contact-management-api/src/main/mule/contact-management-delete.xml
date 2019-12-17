@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="delete-contact" doc:id="e65391fd-8c6a-44dd-96b2-d306f389fe02" >
+		<logger level="INFO" doc:name="start" doc:id="14452574-39c2-477a-a80f-959e6d6c0ec7" message="#[attributes] - Delete contact request"/>
+		<db:delete doc:name="Delete" doc:id="58eb4b44-46fa-4400-8e73-9fdd5ddede73" config-ref="Database_Config">
+			<db:sql >DELETE FROM contact.create_contact WHERE id = :contactId;</db:sql>
+			<db:input-parameters ><![CDATA[#[{'contactId' : attributes.uriParams.contactId}]]]></db:input-parameters>
+		</db:delete>
+		<ee:transform doc:name="Transform Message" doc:id="5cd3d433-f843-41b4-a29f-cfb87bc95eed" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": "Deleted successfully"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="End" doc:id="7ec0b6e5-79ee-4c75-aa50-62a69c8ea44d" message="#[payload] - Contact Deleted"/>
+	</sub-flow>
+</mule>
